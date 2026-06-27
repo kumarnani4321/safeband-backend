@@ -310,6 +310,38 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// GET /api/chat — Real-time AI Health Assistant
+app.get('/api/chat', (req, res) => {
+  const query = (req.query.q || '').toLowerCase().trim();
+  let response = "I am your AI Health Assistant. Ask me basic medical questions (e.g. CPR, bleeding, heart rate, panic, shock) or how to keep safe.";
+
+  if (!query) {
+    return res.json({ reply: response });
+  }
+
+  if (query.includes('hi') || query.includes('hello') || query.includes('hey')) {
+    response = "Hello! I am your SafePulse AI Health Assistant. How can I help you with your health or safety today? Try asking about 'first aid' or 'cpr'.";
+  } else if (query.includes('cpr') || query.includes('cardiac') || query.includes('breath')) {
+    response = "🏥 CPR Guideline:\n1. Call emergency services.\n2. Push hard and fast in the center of the chest (100-120 compressions per minute).\n3. Deliver rescue breaths if trained.";
+  } else if (query.includes('bleed') || query.includes('cut') || query.includes('wound')) {
+    response = "🩸 Bleeding Management:\n1. Apply firm, direct pressure to the wound with a clean cloth.\n2. Elevate the injured limb above heart level.\n3. Keep pressing until bleeding stops. Seek medical care if deep.";
+  } else if (query.includes('panic') || query.includes('scream') || query.includes('fear') || query.includes('anxiety')) {
+    response = "🧘 Dealing with Panic/Fear:\n1. Sit down and plant your feet firmly on the ground.\n2. Focus on slow, deep breathing: inhale for 4 seconds, hold for 4, exhale for 4.\n3. SafePulse AI has notified your guardian. Stay where you are; help is on the way.";
+  } else if (query.includes('heart') || query.includes('pulse') || query.includes('bpm')) {
+    response = "❤️ Heart Rate Info:\nA normal resting heart rate is 60-100 BPM. If the app detects >120 BPM during high stress, it raises your Risk Score. Cover the camera lens fully to get an accurate reading!";
+  } else if (query.includes('shock') || query.includes('faint')) {
+    response = "⚡ Shock/Fainting:\n1. Lay the person flat on their back.\n2. Elevate their feet about 12 inches.\n3. Keep them warm and comfortable. Do not give them anything to eat or drink.";
+  } else if (query.includes('head') || query.includes('concussion') || query.includes('fall')) {
+    response = "🧠 Head Injury:\n1. Keep the person completely still.\n2. Apply a cold pack wrapped in a cloth to reduce swelling.\n3. Watch for dizziness, vomiting, or confusion—seek immediate medical help if present.";
+  } else if (query.includes('thank') || query.includes('ok') || query.includes('good')) {
+    response = "You're very welcome! Stay safe and healthy. I am always here to assist you.";
+  } else {
+    response = "I understand you are asking about safety or health. For immediate emergencies, please press the SOS button. For first aid, you can ask me about 'CPR', 'bleeding', 'elevated heart rate', or 'panic attack'.";
+  }
+
+  res.json({ reply: response });
+});
+
 // ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
