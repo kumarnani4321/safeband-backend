@@ -127,7 +127,8 @@ async function sendSMS(victimId, victimData, riskResult) {
     to: targetPhone,
     text: textMessage,
     sent: false,
-    victimId
+    victimId,
+    phone: victimData.phone
   };
 
   alertHistory.unshift(messageRecord);
@@ -247,7 +248,7 @@ app.post('/api/sensor', (req, res) => {
   let alertFired = null;
   if (riskResult.alertTriggered) {
     // Debounce: only send SMS if not alerted in last 30 seconds
-    const lastAlert = alertHistory.find(a => a.victimId === victimId);
+    const lastAlert = alertHistory.find(a => a.phone === victimData.phone);
     const lastAlertAge = lastAlert ? (Date.now() - new Date(lastAlert.timestamp).getTime()) : Infinity;
 
     if (lastAlertAge > 30000) {
