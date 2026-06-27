@@ -1,7 +1,7 @@
 /**
- * AI SafeBand Backend Server
+ * SafePulse AI Backend Server
  * Express + WebSocket Risk Engine
- * 
+ *
  * Risk Scoring:
  *   Shake (accelerometer) > threshold  → +40 pts
  *   Scream detected (mic)              → +35 pts
@@ -44,6 +44,15 @@ app.use(express.json());
 // ─── In-memory Data Store ────────────────────────────────────────────────────
 const victims = new Map();       // victimId → victimData
 const alertHistory = [];         // All fired alerts
+
+// ─── Phone Normalizer: strips non-digits, takes last 10, adds +91 ────────────
+function normalizePhone(phone) {
+  if (!phone) return phone;
+  const digits = phone.replace(/\D/g, '');
+  const last10 = digits.slice(-10);
+  if (last10.length === 10) return `+91${last10}`;
+  return phone; // return as-is if not 10 digits
+}
 const connectedGuardians = new Set(); // WebSocket clients (guardians)
 
 // ─── Risk Engine ─────────────────────────────────────────────────────────────
@@ -93,11 +102,11 @@ function calculateRiskScore(sensorData) {
 async function sendSMS(victimId, victimData, riskResult) {
   const { lat, lng } = victimData.location || { lat: 0, lng: 0 };
   const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
-  const targetPhone = victimData.guardianPhone || process.env.GUARDIAN_PHONE;
+  const rawPhone = victimData.guardianPhone || process.env.GUARDIAN_PHONE;
+  const targetPhone = normalizePhone(rawPhone);
 
-  const textMessage = `SafeBand Alert: ${victimData.name || 'User'}!
-Risk:${riskResult.score}
-Loc:${mapsLink}`;
+  // Compact SMS — fits within Twilio 160-char free trial limit
+  const textMessage = `SafePulse AI ALERT!\n${victimData.name || 'User'} needs help! Risk:${riskResult.alertLevel}(${riskResult.score}/100)\nLocation:${mapsLink}`;
 
   const messageRecord = {
     id: uuidv4(),
