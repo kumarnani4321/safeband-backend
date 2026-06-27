@@ -240,7 +240,8 @@ app.post('/api/sensor', (req, res) => {
     lastSeen: timestamp || new Date().toISOString()
   };
 
-  victims.set(victimId, victimData);
+  const uniqueKey = (phone && phone !== 'N/A') ? normalizePhone(phone) : victimId;
+  victims.set(uniqueKey, victimData);
 
   // Fire alert if score >= 70
   let alertFired = null;
