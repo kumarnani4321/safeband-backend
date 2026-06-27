@@ -98,6 +98,19 @@ function calculateRiskScore(sensorData) {
   return { score: Math.min(score, 100), reasons, alertTriggered, alertLevel };
 }
 
+function formatSMSDateTime() {
+  const date = new Date();
+  const options = {
+    timeZone: 'Asia/Kolkata',
+    day: 'numeric',
+    month: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  };
+  return date.toLocaleString('en-IN', options).replace(/,/, '');
+}
+
 // ─── SMS Alert (Twilio / Mock) ────────────────────────────────────────────────
 async function sendSMS(victimId, victimData, riskResult) {
   const { lat, lng } = victimData.location || { lat: 0, lng: 0 };
@@ -105,8 +118,8 @@ async function sendSMS(victimId, victimData, riskResult) {
   const rawPhone = victimData.guardianPhone || process.env.GUARDIAN_PHONE;
   const targetPhone = normalizePhone(rawPhone);
 
-  // Compact SMS — fits within Twilio 160-char free trial limit
-  const textMessage = `SafePulse AI ALERT!\n${victimData.name || 'User'} needs help! Risk:${riskResult.alertLevel}(${riskResult.score}/100)\nLocation:${mapsLink}`;
+  // Compact SMS — fits within Twilio 160-char free trial limit with Date & Time
+  const textMessage = `SafePulse AI ALERT!\n${victimData.name || 'User'} needs help!\nRisk:${riskResult.alertLevel} (${riskResult.score}/100)\nTime:${formatSMSDateTime()}\nLoc:${mapsLink}`;
 
   const messageRecord = {
     id: uuidv4(),
