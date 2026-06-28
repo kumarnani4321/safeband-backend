@@ -118,8 +118,8 @@ async function sendSMS(victimId, victimData, riskResult) {
   const rawPhone = victimData.guardianPhone || process.env.GUARDIAN_PHONE;
   const targetPhone = normalizePhone(rawPhone);
 
-  // Compact SMS — fits within Twilio 160-char free trial limit with Date & Time
-  const textMessage = `SafePulse AI ALERT!\n${victimData.name || 'User'} needs help!\nRisk:${riskResult.alertLevel} (${riskResult.score}/100)\nTime:${formatSMSDateTime()}\nLoc:${mapsLink}`;
+  // Compact SMS — formatted with newlines and spacing for readability
+  const textMessage = `\n\nSafePulse AI ALERT!\n${victimData.name || 'User'} needs help!\nRisk : ${riskResult.alertLevel} (${riskResult.score}/100)\nTime : ${formatSMSDateTime()}\nLocation : ${mapsLink}`;
 
   const messageRecord = {
     id: uuidv4(),
