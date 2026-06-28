@@ -128,7 +128,9 @@ async function sendSMS(victimId, victimData, riskResult) {
     text: textMessage,
     sent: false,
     victimId,
-    phone: victimData.phone
+    phone: victimData.phone,
+    score: riskResult.score,
+    level: riskResult.alertLevel
   };
 
   alertHistory.unshift(messageRecord);
